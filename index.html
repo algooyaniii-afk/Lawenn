@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>مدير الطلبيات · ليل/نهار</title>
+  <title>مدير الطلبيات · متكامل</title>
   
-  <!-- Tailwind + Font Awesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -13,7 +12,7 @@
     * { direction: rtl; text-align: right; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background 0.25s, color 0.2s; }
     
-    /* الوضع الليلي - يُطبَّق على الجسم */
+    /* الوضع الليلي */
     body.dark-mode {
       background: #0b1120;
       color: #e8edf5;
@@ -63,6 +62,14 @@
     }
     body.dark-mode .nav-item.active {
       background: rgba(255,255,255,0.15);
+    }
+    body.dark-mode .order-actions .btn-action {
+      background: #1e293b;
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+    body.dark-mode .order-actions .btn-action:hover {
+      background: #334155;
     }
     
     /* الشريط الجانبي */
@@ -133,7 +140,7 @@
       border-radius: 24px;
       padding: 28px 32px;
       box-shadow: 0 6px 24px rgba(0,0,0,0.06);
-      max-width: 780px;
+      max-width: 900px;
       margin: 0 auto;
       transition: background 0.2s, box-shadow 0.2s;
     }
@@ -229,14 +236,6 @@
     .btn-secondary:hover {
       background: #cbd5e1;
     }
-    .btn-danger {
-      background: #ef4444;
-      color: white;
-    }
-    .btn-danger:hover {
-      background: #dc2626;
-      transform: scale(0.97);
-    }
     
     /* قائمة الطلبيات */
     .orders-list {
@@ -256,23 +255,110 @@
       background: #0f172a;
       border-color: #2d3a4f;
     }
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
     .order-details {
       font-size: 16px;
       font-weight: 500;
       color: #0f172a;
-      margin-bottom: 6px;
+      flex: 1;
       word-break: break-word;
     }
+    .order-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-active { background: #dbeafe; color: #1e40af; }
+    .status-completed { background: #dcfce7; color: #166534; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .status-postponed { background: #fef3c7; color: #92400e; }
+    
+    body.dark-mode .status-active { background: #1e3a5f; color: #93c5fd; }
+    body.dark-mode .status-completed { background: #14532d; color: #86efac; }
+    body.dark-mode .status-cancelled { background: #7f1d1d; color: #fca5a5; }
+    body.dark-mode .status-postponed { background: #78350f; color: #fcd34d; }
+    
     .order-meta {
       font-size: 13px;
       color: #64748b;
       display: flex;
       flex-wrap: wrap;
       gap: 14px 20px;
+      margin-top: 8px;
     }
     .order-meta i {
       margin-left: 4px;
     }
+    .order-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e9edf2;
+    }
+    body.dark-mode .order-actions {
+      border-top-color: #334155;
+    }
+    .order-actions .btn-action {
+      padding: 6px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .order-actions .btn-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+    .order-actions .btn-action i { font-size: 14px; }
+    .btn-complete { border-color: #22c55e; color: #166534; }
+    .btn-complete:hover { background: #dcfce7; }
+    .btn-cancel { border-color: #ef4444; color: #991b1b; }
+    .btn-cancel:hover { background: #fee2e2; }
+    .btn-postpone { border-color: #eab308; color: #92400e; }
+    .btn-postpone:hover { background: #fef3c7; }
+    .btn-undo { border-color: #8b5cf6; color: #5b21b6; }
+    .btn-undo:hover { background: #ede9fe; }
+    .btn-edit { border-color: #3b82f6; color: #1e40af; }
+    .btn-edit:hover { background: #dbeafe; }
+    .btn-delete { border-color: #ef4444; color: #991b1b; }
+    .btn-delete:hover { background: #fee2e2; }
+    
+    body.dark-mode .order-actions .btn-action {
+      background: #1e293b;
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+    body.dark-mode .btn-complete { border-color: #22c55e; color: #86efac; }
+    body.dark-mode .btn-complete:hover { background: #14532d; }
+    body.dark-mode .btn-cancel { border-color: #ef4444; color: #fca5a5; }
+    body.dark-mode .btn-cancel:hover { background: #7f1d1d; }
+    body.dark-mode .btn-postpone { border-color: #eab308; color: #fcd34d; }
+    body.dark-mode .btn-postpone:hover { background: #78350f; }
+    body.dark-mode .btn-undo { border-color: #8b5cf6; color: #a78bfa; }
+    body.dark-mode .btn-undo:hover { background: #4c1d95; }
+    body.dark-mode .btn-edit { border-color: #3b82f6; color: #93c5fd; }
+    body.dark-mode .btn-edit:hover { background: #1e3a5f; }
+    body.dark-mode .btn-delete { border-color: #ef4444; color: #fca5a5; }
+    body.dark-mode .btn-delete:hover { background: #7f1d1d; }
+    
     .empty-state {
       text-align: center;
       padding: 40px 10px;
@@ -282,6 +368,65 @@
       font-size: 48px;
       margin-bottom: 12px;
       opacity: 0.5;
+    }
+    
+    /* نافذة التعديل */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      animation: fadeIn 0.2s;
+    }
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    body.dark-mode .modal-box {
+      background: #1e293b;
+    }
+    .modal-box h3 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-box textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      min-height: 100px;
+    }
+    body.dark-mode .modal-box textarea {
+      background: #0f172a;
+      border-color: #334155;
+      color: #f1f5f9;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .modal-actions .btn {
+      flex: 1;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
     
     /* Notification */
@@ -330,7 +475,6 @@
       transform: rotate(12deg);
     }
     
-    /* استجابة */
     @media (max-width: 768px) {
       .sidebar {
         width: 100%;
@@ -382,6 +526,16 @@
       }
       .button-group { flex-wrap: wrap; }
       .btn { flex: 1 1 100%; }
+      .order-header {
+        flex-direction: column;
+      }
+      .order-actions {
+        justify-content: center;
+      }
+      .order-actions .btn-action {
+        font-size: 12px;
+        padding: 5px 10px;
+      }
     }
   </style>
 </head>
@@ -547,130 +701,4 @@
           details: details,
           date: date,
           time: now.time,
-          day: getArabicDay(getDateFromInput(date)),
-          month: getArabicMonth(getDateFromInput(date)),
-          status: 'active',
-          createdAt: now.date + ' ' + now.time
-        };
-
-        orders.push(newOrder);
-        localStorage.setItem('orders_app', JSON.stringify(orders));
-
-        // تنظيف الحقول مع بقاء التاريخ الحالي
-        orderDetails.value = '';
-        const today = getCurrentDateTime();
-        orderDate.value = today.date;
-        updateDayMonth();
-
-        showNotification('✅ تم إضافة الطلبية بنجاح!');
-      }
-
-      // ---------- عرض الطلبيات ----------
-      function renderOrders() {
-        if (!ordersContainer) return;
-        if (orders.length === 0) {
-          ordersContainer.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-inbox"></i>
-              <p>لا توجد طلبيات حتى الآن</p>
-              <p class="text-sm opacity-60">أضف طلبية جديدة من صفحة الإضافة</p>
-            </div>
-          `;
-          return;
-        }
-
-        // عرض من الأحدث إلى الأقدم
-        const sorted = [...orders].reverse();
-        let html = '';
-        sorted.forEach(order => {
-          html += `
-            <div class="order-item">
-              <div class="order-details">${escapeHtml(order.details)}</div>
-              <div class="order-meta">
-                <span><i class="far fa-calendar-alt"></i> ${order.day}، ${order.date}</span>
-                <span><i class="far fa-clock"></i> ${order.time || '--:--'}</span>
-                <span><i class="far fa-calendar-check"></i> ${order.month || ''}</span>
-                <span style="color:#22c55e;"><i class="fas fa-check-circle"></i> نشط</span>
-              </div>
-            </div>
-          `;
-        });
-        ordersContainer.innerHTML = html;
-      }
-
-      // هروب بسيط للأمان
-      function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-      }
-
-      // ---------- الإشعارات ----------
-      function showNotification(message, type = 'success') {
-        const existing = document.querySelector('.notification');
-        if (existing) existing.remove();
-        
-        const notification = document.createElement('div');
-        notification.className = `notification ${type === 'error' ? 'error' : ''}`;
-        notification.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-          notification.style.animation = 'slideDown 0.3s ease reverse';
-          setTimeout(() => notification.remove(), 300);
-        }, 3000);
-      }
-
-      // ---------- الوضع الليلي / النهاري ----------
-      function initTheme() {
-        const stored = localStorage.getItem('theme_mode') || 'light';
-        const body = document.body;
-        const icon = document.querySelector('#themeToggle i');
-        if (stored === 'dark') {
-          body.classList.add('dark-mode');
-          icon.className = 'fas fa-sun';
-        } else {
-          body.classList.remove('dark-mode');
-          icon.className = 'fas fa-moon';
-        }
-      }
-
-      document.getElementById('themeToggle').addEventListener('click', function() {
-        const body = document.body;
-        const icon = this.querySelector('i');
-        if (body.classList.contains('dark-mode')) {
-          body.classList.remove('dark-mode');
-          icon.className = 'fas fa-moon';
-          localStorage.setItem('theme_mode', 'light');
-        } else {
-          body.classList.add('dark-mode');
-          icon.className = 'fas fa-sun';
-          localStorage.setItem('theme_mode', 'dark');
-        }
-      });
-
-      // ---------- تهيئة الصفحة ----------
-      function init() {
-        // تهيئة الوضع
-        initTheme();
-
-        // ضبط التاريخ
-        const now = getCurrentDateTime();
-        orderDate.value = now.date;
-        updateDayMonth();
-        orderDate.addEventListener('change', updateDayMonth);
-
-        // عرض الصفحة الافتراضية (الإضافة)
-        switchPage('add');
-
-        // عند تحميل العرض، نعرض الطلبيات
-        // لكن الصفحة مخفية، سيتم العرض عند التبديل إليها
-        // نعرضها احتياطياً
-        renderOrders();
-      }
-
-      document.addEventListener('DOMContentLoaded', init);
-    })();
-  </script>
-</body>
-                </html>
+          
