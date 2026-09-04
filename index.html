@@ -1,423 +1,676 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدير الطلبيات - إضافة</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>مدير الطلبيات · ليل/نهار</title>
+  
+  <!-- Tailwind + Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    * { direction: rtl; text-align: right; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background 0.25s, color 0.2s; }
     
-    <!-- Tailwind CSS و Font Awesome -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    /* الوضع الليلي - يُطبَّق على الجسم */
+    body.dark-mode {
+      background: #0b1120;
+      color: #e8edf5;
+    }
+    body.dark-mode .sidebar {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      box-shadow: -2px 0 12px rgba(0,0,0,0.6);
+    }
+    body.dark-mode .add-card,
+    body.dark-mode .orders-card {
+      background: #1e293b;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      color: #e8edf5;
+    }
+    body.dark-mode .form-group textarea,
+    body.dark-mode .form-group input {
+      background: #0f172a;
+      border-color: #334155;
+      color: #f1f5f9;
+    }
+    body.dark-mode .readonly-input {
+      background: #1e293b;
+      color: #94a3b8;
+    }
+    body.dark-mode .btn-secondary {
+      background: #334155;
+      color: #f1f5f9;
+    }
+    body.dark-mode .btn-secondary:hover {
+      background: #475569;
+    }
+    body.dark-mode .order-item {
+      background: #0f172a;
+      border-color: #334155;
+    }
+    body.dark-mode .order-item .order-details {
+      color: #e2e8f0;
+    }
+    body.dark-mode .order-item .order-meta {
+      color: #94a3b8;
+    }
+    body.dark-mode .empty-state {
+      color: #94a3b8;
+    }
+    body.dark-mode .nav-item:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    body.dark-mode .nav-item.active {
+      background: rgba(255,255,255,0.15);
+    }
     
-    <style>
-        * { direction: rtl; text-align: right; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
-        
-        /* الشريط الجانبي */
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            right: 0;
-            top: 0;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        
-        .sidebar-logo {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid rgba(255,255,255,0.2);
-        }
-        
-        .sidebar-logo h1 {
-            font-size: 20px;
-            margin: 0;
-        }
-        
-        .sidebar-nav {
-            padding: 20px 0;
-        }
-        
-        .nav-item {
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-right: 4px solid transparent;
-        }
-        
-        .nav-item:hover {
-            background: rgba(255,255,255,0.1);
-            border-right-color: #fbbf24;
-        }
-        
-        .nav-item.active {
-            background: rgba(255,255,255,0.2);
-            border-right-color: #fbbf24;
-        }
-        
-        .nav-item i {
-            font-size: 18px;
-            min-width: 25px;
-        }
-        
-        .main-content {
-            margin-right: 280px;
-            padding: 30px;
-            min-height: 100vh;
-        }
-        
-        /* بطاقة الإضافة */
-        .add-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .add-card h2 {
-            font-size: 24px;
-            color: #1e293b;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .form-group textarea,
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s;
-        }
-        
-        .form-group textarea:focus,
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .readonly-input {
-            background: #f1f5f9;
-            cursor: not-allowed;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 30px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #334155;
-        }
-        
-        .btn-secondary:hover {
-            background: #cbd5e1;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #22c55e;
-            color: white;
-            padding: 14px 24px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 2000;
-            animation: slideDown 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        @keyframes slideDown {
-            from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
-            }
-            
-            .sidebar-logo {
-                border-bottom: none;
-                border-left: 2px solid rgba(255,255,255,0.2);
-                padding: 15px;
-            }
-            
-            .sidebar-nav {
-                display: flex;
-                gap: 10px;
-                padding: 0;
-            }
-            
-            .nav-item {
-                padding: 10px 15px;
-                border-right: none;
-                border-bottom: 3px solid transparent;
-            }
-            
-            .nav-item.active,
-            .nav-item:hover {
-                border-right: none;
-                border-bottom-color: #fbbf24;
-            }
-            
-            .main-content {
-                margin-right: 0;
-                padding: 20px;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    /* الشريط الجانبي */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      height: 100vh;
+      position: fixed;
+      right: 0;
+      top: 0;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+      transition: background 0.3s;
+    }
+    .sidebar-logo {
+      padding: 20px 16px;
+      text-align: center;
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-logo h1 {
+      font-size: 20px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-nav {
+      padding: 16px 0;
+    }
+    .nav-item {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.25s;
+      border-right: 4px solid transparent;
+      font-weight: 500;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.12);
+      border-right-color: #fbbf24;
+    }
+    .nav-item.active {
+      background: rgba(255,255,255,0.2);
+      border-right-color: #fbbf24;
+    }
+    .nav-item i {
+      font-size: 18px;
+      min-width: 24px;
+    }
+    
+    /* المحتوى الرئيسي */
+    .main-content {
+      margin-right: 280px;
+      padding: 32px 28px;
+      min-height: 100vh;
+      transition: background 0.2s;
+    }
+    
+    /* بطاقات */
+    .add-card, .orders-card {
+      background: white;
+      border-radius: 24px;
+      padding: 28px 32px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+      max-width: 780px;
+      margin: 0 auto;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .add-card h2, .orders-card h2 {
+      font-size: 24px;
+      color: #1e293b;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    body.dark-mode .add-card h2,
+    body.dark-mode .orders-card h2 {
+      color: #f1f5f9;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    body.dark-mode .form-group label {
+      color: #cbd5e1;
+    }
+    .form-group textarea,
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s;
+      background: #fafcff;
+    }
+    .form-group textarea:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102,126,234,0.15);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .readonly-input {
+      background: #f1f5f9;
+      cursor: default;
+      color: #475569;
+    }
+    body.dark-mode .readonly-input {
+      background: #1e293b;
+      color: #94a3b8;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+      transform: scale(0.97);
+    }
+    
+    /* قائمة الطلبيات */
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .order-item {
+      background: #f8fafc;
+      border: 1px solid #e9edf2;
+      border-radius: 16px;
+      padding: 18px 22px;
+      transition: background 0.15s;
+    }
+    body.dark-mode .order-item {
+      background: #0f172a;
+      border-color: #2d3a4f;
+    }
+    .order-details {
+      font-size: 16px;
+      font-weight: 500;
+      color: #0f172a;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+    .order-meta {
+      font-size: 13px;
+      color: #64748b;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 20px;
+    }
+    .order-meta i {
+      margin-left: 4px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 40px 10px;
+      color: #94a3b8;
+    }
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+    
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #22c55e;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      z-index: 2000;
+      animation: slideDown 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+    }
+    .notification.error {
+      background: #ef4444;
+    }
+    @keyframes slideDown {
+      from { transform: translateX(-50%) translateY(-80px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+    
+    /* زر تبديل المظهر */
+    .theme-toggle {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.3);
+      transform: rotate(12deg);
+    }
+    
+    /* استجابة */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 4px 10px;
+      }
+      .sidebar-logo {
+        border-bottom: none;
+        border-left: 2px solid rgba(255,255,255,0.2);
+        padding: 10px 14px;
+        flex: 1;
+      }
+      .sidebar-logo h1 { font-size: 18px; }
+      .sidebar-nav {
+        display: flex;
+        gap: 6px;
+        padding: 8px 0;
+        flex-wrap: wrap;
+      }
+      .nav-item {
+        padding: 8px 14px;
+        border-right: none;
+        border-bottom: 3px solid transparent;
+        font-size: 14px;
+      }
+      .nav-item.active,
+      .nav-item:hover {
+        border-right: none;
+        border-bottom-color: #fbbf24;
+      }
+      .main-content {
+        margin-right: 0;
+        padding: 18px 14px;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .add-card, .orders-card {
+        padding: 20px 16px;
+      }
+      .theme-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+      }
+      .button-group { flex-wrap: wrap; }
+      .btn { flex: 1 1 100%; }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- الشريط الجانبي -->
-    <div class="sidebar">
-        <div class="sidebar-logo">
-            <h1>📋 مدير الطلبيات</h1>
-        </div>
-        <div class="sidebar-nav">
-            <div class="nav-item active" onclick="goToPage('index.html')">
-                <i class="fas fa-plus-circle"></i>
-                <span>إضافة طلبية</span>
+  <!-- الشريط الجانبي -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h1><i class="fas fa-clipboard-list"></i> مدير الطلبيات</h1>
+      <button class="theme-toggle" id="themeToggle" aria-label="تبديل المظهر">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" id="navAdd" onclick="switchPage('add')">
+        <i class="fas fa-plus-circle"></i> <span>إضافة طلبية</span>
+      </div>
+      <div class="nav-item" id="navView" onclick="switchPage('view')">
+        <i class="fas fa-list"></i> <span>عرض الطلبيات</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- المحتوى الرئيسي -->
+  <div class="main-content" id="mainContent">
+
+    <!-- ========== صفحة الإضافة ========== -->
+    <div id="pageAdd" class="page-section">
+      <div class="add-card">
+        <h2><i class="fas fa-pen-alt" style="color: #667eea;"></i> طلبية جديدة</h2>
+        <form onsubmit="publishOrder(event)">
+          <div class="form-group">
+            <label for="orderDetails">تفاصيل الطلبية <span class="text-red-500">*</span></label>
+            <textarea id="orderDetails" rows="4" placeholder="أدخل تفاصيل الطلبية ..." required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="orderDate">التاريخ</label>
+              <input type="date" id="orderDate" required>
             </div>
-            <div class="nav-item" onclick="goToPage('view.html')">
-                <i class="fas fa-list"></i>
-                <span>عرض الطلبيات</span>
+            <div class="form-group">
+              <label for="orderDay">اليوم</label>
+              <input type="text" id="orderDay" class="readonly-input" readonly>
             </div>
-        </div>
+            <div class="form-group">
+              <label for="orderMonth">الشهر</label>
+              <input type="text" id="orderMonth" class="readonly-input" readonly>
+            </div>
+          </div>
+          <div class="button-group">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> نشر</button>
+            <button type="reset" class="btn btn-secondary"><i class="fas fa-undo-alt"></i> تفريغ</button>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <!-- المحتوى الرئيسي -->
-    <div class="main-content">
-        <div class="add-card">
-            <h2>
-                <i class="fas fa-plus-circle" style="color: #667eea;"></i>
-                إضافة طلبية جديدة
-            </h2>
-            
-            <form onsubmit="publishOrder(event)">
-                <div class="form-group">
-                    <label for="orderDetails">تفاصيل الطلبية *</label>
-                    <textarea id="orderDetails" rows="4" placeholder="أدخل تفاصيل الطلبية..." required></textarea>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="orderDate">التاريخ *</label>
-                        <input type="date" id="orderDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="orderDay">اليوم</label>
-                        <input type="text" id="orderDay" class="readonly-input" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="orderMonth">الشهر</label>
-                        <input type="text" id="orderMonth" class="readonly-input" readonly>
-                    </div>
-                </div>
-                
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> نشر
-                    </button>
-                    <button type="reset" class="btn btn-secondary">
-                        <i class="fas fa-eraser"></i> تفريغ
-                    </button>
-                </div>
-            </form>
+    <!-- ========== صفحة العرض ========== -->
+    <div id="pageView" class="page-section" style="display: none;">
+      <div class="orders-card">
+        <h2><i class="fas fa-list-ul" style="color: #667eea;"></i> جميع الطلبيات</h2>
+        <div id="ordersListContainer" class="orders-list">
+          <!-- سيتم تعبئتها بواسطة JavaScript -->
         </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // البيانات
-        let orders = JSON.parse(localStorage.getItem('orders_app')) || [];
+  <script>
+    (function(){
+      "use strict";
 
-        // دوال التاريخ
-        function getArabicDay(date) {
-            const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            return days[date.getDay()];
+      // ---------- البيانات ----------
+      let orders = JSON.parse(localStorage.getItem('orders_app')) || [];
+
+      // ---------- دوال التاريخ ----------
+      function getArabicDay(date) {
+        const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        return days[date.getDay()];
+      }
+      function getArabicMonth(date) {
+        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
+                       'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        return months[date.getMonth()];
+      }
+      function getDateFromInput(dateStr) {
+        const parts = dateStr.split('-');
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      }
+      function getCurrentDateTime() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        return {
+          date: `${y}-${m}-${d}`,
+          time: `${h}:${min}`,
+          day: getArabicDay(now),
+          month: getArabicMonth(now)
+        };
+      }
+      function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+      }
+
+      // ---------- عناصر DOM ----------
+      const pageAdd = document.getElementById('pageAdd');
+      const pageView = document.getElementById('pageView');
+      const navAdd = document.getElementById('navAdd');
+      const navView = document.getElementById('navView');
+      const ordersContainer = document.getElementById('ordersListContainer');
+
+      const orderDetails = document.getElementById('orderDetails');
+      const orderDate = document.getElementById('orderDate');
+      const orderDay = document.getElementById('orderDay');
+      const orderMonth = document.getElementById('orderMonth');
+
+      // ---------- تبديل الصفحات ----------
+      window.switchPage = function(page) {
+        if (page === 'add') {
+          pageAdd.style.display = 'block';
+          pageView.style.display = 'none';
+          navAdd.classList.add('active');
+          navView.classList.remove('active');
+        } else {
+          pageAdd.style.display = 'none';
+          pageView.style.display = 'block';
+          navView.classList.add('active');
+          navAdd.classList.remove('active');
+          renderOrders();
+        }
+      }
+
+      // ---------- تحديث اليوم/الشهر ----------
+      function updateDayMonth() {
+        const val = orderDate.value;
+        if (val) {
+          const d = getDateFromInput(val);
+          orderDay.value = getArabicDay(d);
+          orderMonth.value = getArabicMonth(d);
+        }
+      }
+
+      // ---------- نشر طلبية ----------
+      window.publishOrder = function(event) {
+        event.preventDefault();
+        const details = orderDetails.value.trim();
+        const date = orderDate.value;
+        if (!details) {
+          showNotification('يرجى إدخال تفاصيل الطلبية', 'error');
+          return;
+        }
+        if (!date) {
+          showNotification('يرجى اختيار التاريخ', 'error');
+          return;
         }
 
-        function getArabicMonth(date) {
-            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
-                           'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-            return months[date.getMonth()];
+        const now = getCurrentDateTime();
+        const newOrder = {
+          id: generateId(),
+          details: details,
+          date: date,
+          time: now.time,
+          day: getArabicDay(getDateFromInput(date)),
+          month: getArabicMonth(getDateFromInput(date)),
+          status: 'active',
+          createdAt: now.date + ' ' + now.time
+        };
+
+        orders.push(newOrder);
+        localStorage.setItem('orders_app', JSON.stringify(orders));
+
+        // تنظيف الحقول مع بقاء التاريخ الحالي
+        orderDetails.value = '';
+        const today = getCurrentDateTime();
+        orderDate.value = today.date;
+        updateDayMonth();
+
+        showNotification('✅ تم إضافة الطلبية بنجاح!');
+      }
+
+      // ---------- عرض الطلبيات ----------
+      function renderOrders() {
+        if (!ordersContainer) return;
+        if (orders.length === 0) {
+          ordersContainer.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>لا توجد طلبيات حتى الآن</p>
+              <p class="text-sm opacity-60">أضف طلبية جديدة من صفحة الإضافة</p>
+            </div>
+          `;
+          return;
         }
 
-        function getCurrentDateTime() {
-            const now = new Date();
-            const y = now.getFullYear();
-            const m = String(now.getMonth() + 1).padStart(2, '0');
-            const d = String(now.getDate()).padStart(2, '0');
-            const h = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-            return {
-                date: `${y}-${m}-${d}`,
-                time: `${h}:${min}`,
-                day: getArabicDay(now),
-                month: getArabicMonth(now)
-            };
+        // عرض من الأحدث إلى الأقدم
+        const sorted = [...orders].reverse();
+        let html = '';
+        sorted.forEach(order => {
+          html += `
+            <div class="order-item">
+              <div class="order-details">${escapeHtml(order.details)}</div>
+              <div class="order-meta">
+                <span><i class="far fa-calendar-alt"></i> ${order.day}، ${order.date}</span>
+                <span><i class="far fa-clock"></i> ${order.time || '--:--'}</span>
+                <span><i class="far fa-calendar-check"></i> ${order.month || ''}</span>
+                <span style="color:#22c55e;"><i class="fas fa-check-circle"></i> نشط</span>
+              </div>
+            </div>
+          `;
+        });
+        ordersContainer.innerHTML = html;
+      }
+
+      // هروب بسيط للأمان
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // ---------- الإشعارات ----------
+      function showNotification(message, type = 'success') {
+        const existing = document.querySelector('.notification');
+        if (existing) existing.remove();
+        
+        const notification = document.createElement('div');
+        notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+        notification.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.style.animation = 'slideDown 0.3s ease reverse';
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+
+      // ---------- الوضع الليلي / النهاري ----------
+      function initTheme() {
+        const stored = localStorage.getItem('theme_mode') || 'light';
+        const body = document.body;
+        const icon = document.querySelector('#themeToggle i');
+        if (stored === 'dark') {
+          body.classList.add('dark-mode');
+          icon.className = 'fas fa-sun';
+        } else {
+          body.classList.remove('dark-mode');
+          icon.className = 'fas fa-moon';
         }
+      }
 
-        function getDateFromInput(dateStr) {
-            const parts = dateStr.split('-');
-            return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      document.getElementById('themeToggle').addEventListener('click', function() {
+        const body = document.body;
+        const icon = this.querySelector('i');
+        if (body.classList.contains('dark-mode')) {
+          body.classList.remove('dark-mode');
+          icon.className = 'fas fa-moon';
+          localStorage.setItem('theme_mode', 'light');
+        } else {
+          body.classList.add('dark-mode');
+          icon.className = 'fas fa-sun';
+          localStorage.setItem('theme_mode', 'dark');
         }
+      });
 
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-        }
+      // ---------- تهيئة الصفحة ----------
+      function init() {
+        // تهيئة الوضع
+        initTheme();
 
-        // تحديث اليوم والشهر
-        function updateDayMonth() {
-            const date = document.getElementById('orderDate').value;
-            if (date) {
-                const d = getDateFromInput(date);
-                document.getElementById('orderDay').value = getArabicDay(d);
-                document.getElementById('orderMonth').value = getArabicMonth(d);
-            }
-        }
+        // ضبط التاريخ
+        const now = getCurrentDateTime();
+        orderDate.value = now.date;
+        updateDayMonth();
+        orderDate.addEventListener('change', updateDayMonth);
 
-        // إضافة طلبية
-        function publishOrder(event) {
-            event.preventDefault();
-            
-            const details = document.getElementById('orderDetails').value.trim();
-            const date = document.getElementById('orderDate').value;
-            
-            if (!details) {
-                showNotification('يرجى إدخال تفاصيل الطلبية', 'error');
-                return;
-            }
+        // عرض الصفحة الافتراضية (الإضافة)
+        switchPage('add');
 
-            const now = getCurrentDateTime();
-            const newOrder = {
-                id: generateId(),
-                details: details,
-                date: date,
-                time: now.time,
-                day: getArabicDay(getDateFromInput(date)),
-                month: getArabicMonth(getDateFromInput(date)),
-                status: 'active',
-                createdAt: now.date + ' ' + now.time
-            };
+        // عند تحميل العرض، نعرض الطلبيات
+        // لكن الصفحة مخفية، سيتم العرض عند التبديل إليها
+        // نعرضها احتياطياً
+        renderOrders();
+      }
 
-            orders.push(newOrder);
-            localStorage.setItem('orders_app', JSON.stringify(orders));
-            
-            document.getElementById('orderDetails').value = '';
-            document.getElementById('orderDate').value = now.date;
-            updateDayMonth();
-            
-            showNotification('✅ تم إضافة الطلبية بنجاح!');
-        }
-
-        // الإشعارات
-        function showNotification(message, type = 'success') {
-            const existing = document.querySelector('.notification');
-            if (existing) existing.remove();
-            
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
-            
-            if (type === 'error') {
-                notification.style.background = '#ef4444';
-            }
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideDown 0.3s ease reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // التنقل بين الصفحات
-        function goToPage(page) {
-            window.location.href = page;
-        }
-
-        // التهيئة
-        function init() {
-            const now = getCurrentDateTime();
-            document.getElementById('orderDate').value = now.date;
-            updateDayMonth();
-            document.getElementById('orderDate').addEventListener('change', updateDayMonth);
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+      document.addEventListener('DOMContentLoaded', init);
+    })();
+  </script>
 </body>
-</html>
+                </html>
