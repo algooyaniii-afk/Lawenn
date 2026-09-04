@@ -3,115 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدير الطلبيات</title>
-    
-    <!-- تعريفات تطبيق PWA (مدمجة) -->
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" href="./icons/icon-192.png">
-    <meta name="theme-color" content="#2563eb">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>مدير الطلبيات - إضافة</title>
     
     <!-- Tailwind CSS و Font Awesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* ====== الأنماط الأساسية ====== */
         * { direction: rtl; text-align: right; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
         
-        /* ====== بطاقات الطلبيات ====== */
-        .order-card {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border-right: 4px solid #3b82f6;
-            position: relative;
-            overflow: hidden;
-        }
-        .order-card.completed { border-right-color: #22c55e; background: #f0fdf4; opacity: 0.7; }
-        .order-card.cancelled { border-right-color: #ef4444; background: #fef2f2; opacity: 0.7; }
-        .order-card.deferred { border-right-color: #94a3b8; background: #f8fafc; }
-        .order-card.faded { opacity: 0.5; pointer-events: none; }
-        
-        .order-card .action-buttons button {
-            transition: all 0.2s;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .order-card .action-buttons button:hover { transform: scale(1.05); }
-        .order-card .action-buttons button:active { transform: scale(0.95); }
-        .order-card .action-buttons button.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        .order-card .action-buttons button.undo-btn {
-            opacity: 1;
-            cursor: pointer;
-            pointer-events: auto;
-        }
-        
-        /* ====== عداد المؤجلات ====== */
-        .deferred-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ef4444;
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 12px;
+            height: 100vh;
+            position: fixed;
+            right: 0;
+            top: 0;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar-logo h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+        
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-right: 4px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-right-color: #fbbf24;
+        }
+        
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+            border-right-color: #fbbf24;
+        }
+        
+        .nav-item i {
+            font-size: 18px;
+            min-width: 25px;
+        }
+        
+        .main-content {
+            margin-right: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+        
+        /* بطاقة الإضافة */
+        .add-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .add-card h2 {
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea,
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .form-group textarea:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .readonly-input {
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            border: 2px solid white;
+            gap: 8px;
         }
         
-        /* ====== النافذة المنبثقة ====== */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            max-width: 400px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
         
-        /* ====== أيقونة الساعة ====== */
-        .clock-icon { position: relative; cursor: pointer; transition: transform 0.2s; }
-        .clock-icon:hover { transform: scale(1.1); }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
         
-        /* ====== الإشعارات ====== */
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        
         .notification {
             position: fixed;
             top: 20px;
@@ -119,8 +179,8 @@
             transform: translateX(-50%);
             background: #22c55e;
             color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 14px 24px;
+            border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             z-index: 2000;
             animation: slideDown 0.3s ease;
@@ -128,262 +188,133 @@
             align-items: center;
             gap: 10px;
         }
+        
         @keyframes slideDown {
             from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
         
-        /* ====== زر التثبيت ====== */
-        .install-btn {
-            background: #2563eb;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-        .install-btn:hover { background: #1d4ed8; transform: scale(1.05); }
-        .install-btn.show { display: inline-flex; }
-        
-        /* ====== بانر التثبيت البديل ====== */
-        .install-banner {
-            display: none;
-            background: #f0f9ff;
-            border: 2px solid #2563eb;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        .install-banner.show { display: flex; }
-        .install-banner p { margin: 0; font-size: 14px; color: #1e293b; }
-        .install-banner button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        
-        /* ====== تمرير ====== */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-        
-        @media (max-width: 640px) {
-            .order-card { padding: 12px; }
-            .modal-content { padding: 16px; }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            
+            .sidebar-logo {
+                border-bottom: none;
+                border-left: 2px solid rgba(255,255,255,0.2);
+                padding: 15px;
+            }
+            
+            .sidebar-nav {
+                display: flex;
+                gap: 10px;
+                padding: 0;
+            }
+            
+            .nav-item {
+                padding: 10px 15px;
+                border-right: none;
+                border-bottom: 3px solid transparent;
+            }
+            
+            .nav-item.active,
+            .nav-item:hover {
+                border-right: none;
+                border-bottom-color: #fbbf24;
+            }
+            
+            .main-content {
+                margin-right: 0;
+                padding: 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ====== الهيدر ====== -->
-    <div class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <h1 class="text-xl font-bold text-gray-800">📋 مدير الطلبيات</h1>
+    <!-- الشريط الجانبي -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <h1>📋 مدير الطلبيات</h1>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-item active" onclick="goToPage('index.html')">
+                <i class="fas fa-plus-circle"></i>
+                <span>إضافة طلبية</span>
             </div>
-            <div class="flex items-center gap-3">
-                <!-- أيقونة المؤجلات -->
-                <div class="clock-icon relative" onclick="openDeferredModal()">
-                    <i class="fas fa-clock text-2xl text-gray-600"></i>
-                    <span id="deferredCount" class="deferred-badge">0</span>
-                </div>
-                <!-- زر التثبيت -->
-                <button id="installBtn" class="install-btn">
-                    <i class="fas fa-download"></i> تثبيت
-                </button>
+            <div class="nav-item" onclick="goToPage('view.html')">
+                <i class="fas fa-list"></i>
+                <span>عرض الطلبيات</span>
             </div>
         </div>
     </div>
 
-    <!-- ====== بانر التثبيت (بديل) ====== -->
-    <div class="max-w-4xl mx-auto px-4 mt-2">
-        <div id="installBanner" class="install-banner">
-            <p><i class="fas fa-mobile-alt text-blue-600 ml-2"></i> قم بتثبيت التطبيق على هاتفك!</p>
-            <button onclick="installApp()">تثبيت الآن</button>
-        </div>
-    </div>
-
-    <!-- ====== النسخ الاحتياطي والاستيراد ====== -->
-    <div class="max-w-4xl mx-auto px-4 mt-2">
-        <div class="bg-white rounded-2xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2 text-sm text-gray-700">
-                <i class="fas fa-database text-blue-600"></i>
-                <span>حماية بياناتك</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="exportBackup()" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1">
-                    <i class="fas fa-download"></i> نسخ احتياطي
-                </button>
-                <button onclick="document.getElementById('importFile').click()" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1">
-                    <i class="fas fa-upload"></i> استيراد
-                </button>
-                <input id="importFile" type="file" accept="application/json,.json" class="hidden" onchange="importBackup(event)">
-            </div>
-        </div>
-    </div>
-
-    <!-- ====== المحتوى الرئيسي ====== -->
-    <div class="max-w-4xl mx-auto px-4 py-4">
-
-        <!-- اختيار التاريخ -->
-        <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <div class="flex items-center gap-3">
-                <label class="text-sm font-medium text-gray-700">التاريخ:</label>
-                <input type="date" id="dateSelector" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
-                <button onclick="resetToToday()" class="text-blue-600 text-sm hover:text-blue-800">
-                    <i class="fas fa-calendar-day"></i> اليوم
-                </button>
-            </div>
-        </div>
-
-        <!-- نموذج إضافة طلبية -->
-        <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <h2 class="text-lg font-semibold mb-3 text-gray-800">
-                <i class="fas fa-plus-circle text-blue-500 ml-2"></i> طلبية جديدة
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+        <div class="add-card">
+            <h2>
+                <i class="fas fa-plus-circle" style="color: #667eea;"></i>
+                إضافة طلبية جديدة
             </h2>
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">تفاصيل الطلبية</label>
-                    <textarea id="orderDetails" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none" placeholder="أدخل تفاصيل الطلبية..."></textarea>
+            
+            <form onsubmit="publishOrder(event)">
+                <div class="form-group">
+                    <label for="orderDetails">تفاصيل الطلبية *</label>
+                    <textarea id="orderDetails" rows="4" placeholder="أدخل تفاصيل الطلبية..." required></textarea>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">التاريخ</label>
-                        <input type="date" id="orderDate" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderDate">التاريخ *</label>
+                        <input type="date" id="orderDate" required>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">اليوم</label>
-                        <input type="text" id="orderDay" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-sm" readonly>
+                    <div class="form-group">
+                        <label for="orderDay">اليوم</label>
+                        <input type="text" id="orderDay" class="readonly-input" readonly>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">الشهر</label>
-                        <input type="text" id="orderMonth" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-sm" readonly>
+                    <div class="form-group">
+                        <label for="orderMonth">الشهر</label>
+                        <input type="text" id="orderMonth" class="readonly-input" readonly>
                     </div>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="publishOrder()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fas fa-paper-plane"></i> نشر
                     </button>
-                    <button onclick="clearForm()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    <button type="reset" class="btn btn-secondary">
                         <i class="fas fa-eraser"></i> تفريغ
                     </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- قائمة الطلبيات -->
-        <div id="ordersContainer" class="space-y-3">
-            <!-- سيتم ملؤها بواسطة JavaScript -->
-        </div>
-    </div>
-
-    <!-- ====== نافذة المؤجلات ====== -->
-    <div id="deferredModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-800">
-                    <i class="fas fa-clock text-gray-600 ml-2"></i> الطلبيات المؤجلة
-                </h3>
-                <button onclick="closeDeferredModal()" class="text-gray-500 hover:text-gray-700 text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <!-- إضافة طلبية مؤجلة -->
-            <div class="mb-4 p-3 bg-gray-50 rounded-xl">
-                <h4 class="text-sm font-medium text-gray-700 mb-2">إضافة طلبية مؤجلة</h4>
-                <div class="space-y-2">
-                    <input type="text" id="deferredDetails" placeholder="تفاصيل الطلبية المؤجلة" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
-                    <input type="datetime-local" id="deferredDateTime" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
-                    <button onclick="addDeferredOrder()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl text-sm transition">
-                        <i class="fas fa-plus ml-1"></i> إضافة مؤجلة
-                    </button>
-                </div>
-            </div>
-            
-            <!-- قائمة المؤجلات -->
-            <div id="deferredOrdersList" class="space-y-2 max-h-60 overflow-y-auto">
-                <!-- سيتم ملؤها بواسطة JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ====== نافذة التعديل على الطلبية ====== -->
-    <div id="editModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-800">
-                    <i class="fas fa-edit text-gray-600 ml-2"></i> تعديل الطلبية
-                </h3>
-                <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700 text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">تفاصيل الطلبية</label>
-                    <textarea id="editDetails" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">التاريخ</label>
-                    <input type="date" id="editDate" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="saveEditOrder()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl text-sm transition">
-                        <i class="fas fa-save ml-1"></i> حفظ التعديلات
-                    </button>
-                    <button onclick="closeEditModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 rounded-xl text-sm transition">
-                        <i class="fas fa-times ml-1"></i> إلغاء
-                    </button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
     <script>
-        // ============================================================
-        // 1. البيانات والتخزين
-        // ============================================================
+        // البيانات
         let orders = JSON.parse(localStorage.getItem('orders_app')) || [];
-        let deferredOrders = JSON.parse(localStorage.getItem('deferred_orders_app')) || [];
-        let editingOrderId = null;
 
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-        }
-
-        function saveData() {
-            localStorage.setItem('orders_app', JSON.stringify(orders));
-            localStorage.setItem('deferred_orders_app', JSON.stringify(deferredOrders));
-            renderAll();
-        }
-
-        // ============================================================
-        // 2. دوال التاريخ
-        // ============================================================
+        // دوال التاريخ
         function getArabicDay(date) {
             const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             return days[date.getDay()];
         }
+
         function getArabicMonth(date) {
             const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
                            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
             return months[date.getMonth()];
         }
+
         function getCurrentDateTime() {
             const now = new Date();
             const y = now.getFullYear();
@@ -395,373 +326,20 @@
                 date: `${y}-${m}-${d}`,
                 time: `${h}:${min}`,
                 day: getArabicDay(now),
-                month: getArabicMonth(now),
-                full: `${y}-${m}-${d}T${h}:${min}`
+                month: getArabicMonth(now)
             };
         }
+
         function getDateFromInput(dateStr) {
             const parts = dateStr.split('-');
             return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
         }
 
-        // ============================================================
-        // 3. عرض البيانات
-        // ============================================================
-        function renderOrders() {
-            const selectedDate = document.getElementById('dateSelector').value;
-            const container = document.getElementById('ordersContainer');
-            const filtered = orders.filter(o => o.date === selectedDate);
-            
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-400">
-                        <i class="fas fa-inbox text-4xl mb-2"></i>
-                        <p>لا توجد طلبيات في هذا التاريخ</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = '';
-            filtered.forEach(order => {
-                const card = document.createElement('div');
-                card.className = `order-card ${order.status}`;
-                
-                const isCompleted = order.status === 'completed';
-                const isCancelled = order.status === 'cancelled';
-                const isDeferred = order.status === 'deferred';
-                const isActive = order.status === 'active';
-                let statusColor = '#3b82f6';
-                if (isCompleted) statusColor = '#22c55e';
-                else if (isCancelled) statusColor = '#ef4444';
-                else if (isDeferred) statusColor = '#94a3b8';
-                card.style.borderRightColor = statusColor;
-                
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex-1">
-                            <p class="text-gray-800 text-sm whitespace-pre-wrap">${order.details}</p>
-                        </div>
-                        <span class="text-xs text-gray-400 ml-2">${order.time}</span>
-                    </div>
-                    <div class="flex items-center justify-between mt-2">
-                        <div class="flex gap-2 action-buttons flex-wrap">
-                            <button onclick="markOrder('${order.id}', 'completed')" class="bg-green-100 text-green-700 hover:bg-green-200 ${isCompleted ? 'disabled' : ''}">
-                                <i class="fas fa-check"></i> تمت
-                            </button>
-                            <button onclick="markOrder('${order.id}', 'cancelled')" class="bg-red-100 text-red-700 hover:bg-red-200 ${isCancelled ? 'disabled' : ''}">
-                                <i class="fas fa-times"></i> ملغية
-                            </button>
-                            <button onclick="deferOrder('${order.id}')" class="bg-gray-100 text-gray-700 hover:bg-gray-200 ${isDeferred ? 'disabled' : ''}">
-                                <i class="fas fa-clock"></i> مؤجلة
-                            </button>
-                            ${!isActive ? `<button onclick="resetOrderStatus('${order.id}')" class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 undo-btn" title="استرجاع الطلبية">
-                                <i class="fas fa-undo"></i> تراجع
-                            </button>` : ''}
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openEditModal('${order.id}')" class="text-blue-400 hover:text-blue-600 text-sm">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteOrder('${order.id}')" class="text-red-400 hover:text-red-600 text-sm">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
         }
 
-        function renderDeferredOrders() {
-            const list = document.getElementById('deferredOrdersList');
-            if (deferredOrders.length === 0) {
-                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا توجد طلبيات مؤجلة</p>';
-                document.getElementById('deferredCount').textContent = '0';
-                return;
-            }
-            list.innerHTML = '';
-            deferredOrders.forEach((order, index) => {
-                const div = document.createElement('div');
-                div.className = 'bg-gray-50 rounded-xl p-3 flex justify-between items-center';
-                const now = new Date();
-                const target = new Date(order.datetime);
-                const diffDays = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
-                const isPast = diffDays < 0;
-                div.innerHTML = `
-                    <div class="flex-1">
-                        <p class="text-sm font-medium text-gray-800">${order.details}</p>
-                        <p class="text-xs text-gray-500">${order.datetime.replace('T', ' ')}</p>
-                        <p class="text-xs ${isPast ? 'text-red-500' : 'text-blue-500'}">
-                            ${isPast ? 'متأخرة' : `متبقي ${diffDays} يوم`}
-                        </p>
-                    </div>
-                    <button onclick="removeDeferredOrder(${index})" class="text-red-400 hover:text-red-600 text-sm">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                list.appendChild(div);
-            });
-            document.getElementById('deferredCount').textContent = deferredOrders.length;
-        }
-
-        function renderAll() {
-            renderOrders();
-            renderDeferredOrders();
-        }
-
-        // ============================================================
-        // 4. عمليات الطلبيات
-        // ============================================================
-        function publishOrder() {
-            const details = document.getElementById('orderDetails').value.trim();
-            const date = document.getElementById('orderDate').value;
-            if (!details) { showNotification('يرجى إدخال تفاصيل الطلبية', 'error'); return; }
-            const now = getCurrentDateTime();
-            const newOrder = {
-                id: generateId(),
-                details: details,
-                date: date || now.date,
-                time: now.time,
-                day: getArabicDay(getDateFromInput(date || now.date)),
-                month: getArabicMonth(getDateFromInput(date || now.date)),
-                status: 'active',
-                createdAt: now.full
-            };
-            orders.push(newOrder);
-            saveData();
-            clearForm();
-            showNotification('✅ تم نشر الطلبية بنجاح');
-        }
-
-        function clearForm() {
-            document.getElementById('orderDetails').value = '';
-            document.getElementById('orderDate').value = getCurrentDateTime().date;
-            updateDayMonth();
-        }
-
-        function markOrder(id, status) {
-            const order = orders.find(o => o.id === id);
-            if (!order) return;
-            if (order.status !== 'active' && order.status !== status) {
-                showNotification('لا يمكن تغيير حالة الطلبية بعد تأكيدها', 'error');
-                return;
-            }
-            order.status = status;
-            if (status === 'deferred') {
-                deferredOrders.push({
-                    id: order.id,
-                    details: order.details,
-                    datetime: order.date + 'T' + order.time,
-                    originalDate: order.date
-                });
-                showNotification('⏰ تم تأجيل الطلبية');
-            }
-            saveData();
-            renderAll();
-        }
-
-        function deferOrder(id) {
-            const order = orders.find(o => o.id === id);
-            if (!order) return;
-            const targetDate = prompt('أدخل التاريخ الجديد للتأجيل (YYYY-MM-DD):', order.date);
-            if (targetDate && targetDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                deferredOrders.push({
-                    id: order.id,
-                    details: order.details,
-                    datetime: targetDate + 'T' + order.time,
-                    originalDate: order.date
-                });
-                order.status = 'deferred';
-                order.date = targetDate;
-                saveData();
-                showNotification('⏰ تم تأجيل الطلبية حتى ' + targetDate);
-            }
-        }
-
-        function resetOrderStatus(id) {
-            const order = orders.find(o => o.id === id);
-            if (!order) return;
-            
-            // إعادة الحالة إلى نشطة
-            order.status = 'active';
-            
-            // إزالة من المؤجلات إن وجدت
-            deferredOrders = deferredOrders.filter(d => d.id !== id);
-            
-            saveData();
-            showNotification('✅ تم استرجاع الطلبية بنجاح');
-        }
-
-        function deleteOrder(id) {
-            if (confirm('هل أنت متأكد من حذف هذه الطلبية؟')) {
-                orders = orders.filter(o => o.id !== id);
-                deferredOrders = deferredOrders.filter(d => d.id !== id);
-                saveData();
-                showNotification('🗑️ تم حذف الطلبية');
-            }
-        }
-
-        // ============================================================
-        // 4.5. تعديل الطلبيات
-        // ============================================================
-        function openEditModal(orderId) {
-            const order = orders.find(o => o.id === orderId);
-            if (!order) return;
-            
-            editingOrderId = orderId;
-            document.getElementById('editDetails').value = order.details;
-            document.getElementById('editDate').value = order.date;
-            document.getElementById('editModal').classList.add('active');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('active');
-            editingOrderId = null;
-        }
-
-        function saveEditOrder() {
-            if (!editingOrderId) return;
-            
-            const order = orders.find(o => o.id === editingOrderId);
-            if (!order) return;
-            
-            const details = document.getElementById('editDetails').value.trim();
-            const date = document.getElementById('editDate').value;
-            
-            if (!details) {
-                showNotification('يرجى إدخال تفاصيل الطلبية', 'error');
-                return;
-            }
-            
-            order.details = details;
-            order.date = date;
-            order.day = getArabicDay(getDateFromInput(date));
-            order.month = getArabicMonth(getDateFromInput(date));
-            
-            // تحديث المؤجلات إذا كانت الطلبية مؤجلة
-            const deferred = deferredOrders.find(d => d.id === editingOrderId);
-            if (deferred) {
-                deferred.details = details;
-                deferred.datetime = date + 'T' + deferred.datetime.split('T')[1];
-            }
-            
-            saveData();
-            closeEditModal();
-            showNotification('✅ تم تحديث الطلبية بنجاح');
-        }
-
-        // ============================================================
-        // 5. إدارة المؤجلات
-        // ============================================================
-        function addDeferredOrder() {
-            const details = document.getElementById('deferredDetails').value.trim();
-            const datetime = document.getElementById('deferredDateTime').value;
-            if (!details) { showNotification('يرجى إدخال تفاصيل الطلبية المؤجلة', 'error'); return; }
-            if (!datetime) { showNotification('يرجى اختيار التاريخ والوقت', 'error'); return; }
-            const newDeferred = {
-                id: generateId(),
-                details: details,
-                datetime: datetime,
-                originalDate: datetime.split('T')[0]
-            };
-            deferredOrders.push(newDeferred);
-            const dateObj = new Date(datetime);
-            orders.push({
-                id: newDeferred.id,
-                details: details,
-                date: datetime.split('T')[0],
-                time: datetime.split('T')[1] || '00:00',
-                day: getArabicDay(dateObj),
-                month: getArabicMonth(dateObj),
-                status: 'deferred',
-                createdAt: getCurrentDateTime().full
-            });
-            document.getElementById('deferredDetails').value = '';
-            document.getElementById('deferredDateTime').value = '';
-            saveData();
-            showNotification('✅ تم إضافة الطلبية المؤجلة');
-        }
-
-        function removeDeferredOrder(index) {
-            if (confirm('هل تريد إزالة هذه الطلبية من المؤجلات؟')) {
-                const orderId = deferredOrders[index].id;
-                deferredOrders.splice(index, 1);
-                const order = orders.find(o => o.id === orderId);
-                if (order && order.status === 'deferred') order.status = 'active';
-                saveData();
-                showNotification('تم إزالة الطلبية من المؤجلات');
-            }
-        }
-
-        function openDeferredModal() {
-            document.getElementById('deferredModal').classList.add('active');
-            document.getElementById('deferredDateTime').value = getCurrentDateTime().full;
-        }
-
-        function closeDeferredModal() {
-            document.getElementById('deferredModal').classList.remove('active');
-        }
-
-        // ============================================================
-        // 6. النسخ الاحتياطي والاستيراد
-        // ============================================================
-        function exportBackup() {
-            const backup = {
-                app: 'مدير الطلبيات',
-                version: 1,
-                exportedAt: new Date().toISOString(),
-                orders: orders,
-                deferredOrders: deferredOrders
-            };
-            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            const date = new Date().toISOString().slice(0, 10);
-            link.href = url;
-            link.download = `نسخة-احتياطية-الطلبيات-${date}.json`;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
-            showNotification('تم تنزيل النسخة الاحتياطية');
-        }
-
-        function isValidBackup(data) {
-            return data && typeof data === 'object' && Array.isArray(data.orders) && Array.isArray(data.deferredOrders)
-                && data.orders.every(o => o && typeof o === 'object' && typeof o.id === 'string' && typeof o.details === 'string')
-                && data.deferredOrders.every(o => o && typeof o === 'object' && typeof o.id === 'string' && typeof o.details === 'string');
-        }
-
-        function importBackup(event) {
-            const file = event.target.files && event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function() {
-                try {
-                    const data = JSON.parse(reader.result);
-                    if (!isValidBackup(data)) throw new Error('invalid backup');
-                    if (!confirm(`سيتم استبدال البيانات الحالية بـ ${data.orders.length} طلبية و${data.deferredOrders.length} طلبية مؤجلة. هل تريد المتابعة؟`)) return;
-                    orders = data.orders;
-                    deferredOrders = data.deferredOrders;
-                    saveData();
-                    showNotification('تم استيراد البيانات بنجاح');
-                } catch (error) {
-                    showNotification('ملف النسخة الاحتياطية غير صالح أو تالف', 'error');
-                } finally {
-                    event.target.value = '';
-                }
-            };
-            reader.onerror = function() {
-                event.target.value = '';
-                showNotification('تعذر قراءة ملف النسخة الاحتياطية', 'error');
-            };
-            reader.readAsText(file, 'UTF-8');
-        }
-
-        // ============================================================
-        // 7. دوال مساعدة
-        // ============================================================
+        // تحديث اليوم والشهر
         function updateDayMonth() {
             const date = document.getElementById('orderDate').value;
             if (date) {
@@ -771,101 +349,73 @@
             }
         }
 
-        function resetToToday() {
-            document.getElementById('dateSelector').value = getCurrentDateTime().date;
-            renderOrders();
+        // إضافة طلبية
+        function publishOrder(event) {
+            event.preventDefault();
+            
+            const details = document.getElementById('orderDetails').value.trim();
+            const date = document.getElementById('orderDate').value;
+            
+            if (!details) {
+                showNotification('يرجى إدخال تفاصيل الطلبية', 'error');
+                return;
+            }
+
+            const now = getCurrentDateTime();
+            const newOrder = {
+                id: generateId(),
+                details: details,
+                date: date,
+                time: now.time,
+                day: getArabicDay(getDateFromInput(date)),
+                month: getArabicMonth(getDateFromInput(date)),
+                status: 'active',
+                createdAt: now.date + ' ' + now.time
+            };
+
+            orders.push(newOrder);
+            localStorage.setItem('orders_app', JSON.stringify(orders));
+            
+            document.getElementById('orderDetails').value = '';
+            document.getElementById('orderDate').value = now.date;
+            updateDayMonth();
+            
+            showNotification('✅ تم إضافة الطلبية بنجاح!');
         }
 
-        // ============================================================
-        // 8. الإشعارات
-        // ============================================================
+        // الإشعارات
         function showNotification(message, type = 'success') {
             const existing = document.querySelector('.notification');
             if (existing) existing.remove();
+            
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
-            if (type === 'error') notification.style.background = '#ef4444';
-            document.body.appendChild(notification);
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('مدير الطلبيات', {
-                    body: message,
-                    icon: 'https://cdn-icons-png.flaticon.com/512/3095/3095203.png'
-                });
+            
+            if (type === 'error') {
+                notification.style.background = '#ef4444';
             }
+            
+            document.body.appendChild(notification);
+            
             setTimeout(() => {
-                notification.style.transform = 'translateX(-50%) translateY(-100px)';
-                notification.style.opacity = '0';
+                notification.style.animation = 'slideDown 0.3s ease reverse';
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
 
-        // ============================================================
-        // 9. تثبيت PWA
-        // ============================================================
-        let deferredPrompt;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBtn').classList.add('show');
-            document.getElementById('installBanner').classList.add('show');
-        });
-
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((result) => {
-                    if (result.outcome === 'accepted') {
-                        showNotification('✅ تم تثبيت التطبيق بنجاح');
-                        document.getElementById('installBtn').classList.remove('show');
-                        document.getElementById('installBanner').classList.remove('show');
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                showNotification('📱 اضغط على "إضافة إلى الشاشة الرئيسية" في قائمة المتصفح', 'error');
-            }
+        // التنقل بين الصفحات
+        function goToPage(page) {
+            window.location.href = page;
         }
 
-        document.getElementById('installBtn').addEventListener('click', installApp);
-
-        // ============================================================
-        // 10. تفعيل الإشعارات
-        // ============================================================
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-        }
-
-        // ============================================================
-        // 11. تسجيل Service Worker
-        // ============================================================
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(err => console.log('SW registration failed:', err));
-        }
-
-        // ============================================================
-        // 12. تهيئة التطبيق
-        // ============================================================
+        // التهيئة
         function init() {
             const now = getCurrentDateTime();
-            document.getElementById('dateSelector').value = now.date;
             document.getElementById('orderDate').value = now.date;
             updateDayMonth();
             document.getElementById('orderDate').addEventListener('change', updateDayMonth);
-            document.getElementById('dateSelector').addEventListener('change', renderOrders);
-            renderAll();
         }
-
-        document.getElementById('deferredModal').addEventListener('click', function(e) {
-            if (e.target === this) closeDeferredModal();
-        });
-
-        document.getElementById('editModal').addEventListener('click', function(e) {
-            if (e.target === this) closeEditModal();
-        });
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
