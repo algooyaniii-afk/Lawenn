@@ -701,4 +701,264 @@
           details: details,
           date: date,
           time: now.time,
+          day: getArabicDay(getDateFromInput(date)),
+          month: getArabicMonth(getDateFromInput(date)),
+          status: 'active', // active, completed, cancelled, postponed
+          createdAt: now.date + ' ' + now.time
+        };
+
+        orders.push(newOrder);
+        localStorage.setItem('orders_app', JSON.stringify(orders));
+
+        orderDetails.value = '';
+        const today = getCurrentDateTime();
+        orderDate.value = today.date;
+        updateDayMonth();
+
+        showNotification('✅ تم إضافة الطلبية بنجاح!');
+      }
+
+      // ---------- تغيير الحالة ----------
+      function changeStatus(id, newStatus) {
+        const order = orders.find(o => o.id === id);
+        if (!order) return;
+        if (order.status === newStatus) {
+          showNotification('الطلبية بنفس الحالة بالفعل', 'error');
+          return;
+        }
+        order.status = newStatus;
+        localStorage.setItem('orders_app', JSON.stringify(orders));
+        renderOrders();
+        const statusNames = {
+          'active': 'نشطة',
+          'completed': 'مكتملة',
+          'cancelled': 'ملغاة',
+          'postponed': 'مؤجلة'
+        };
+        showNotification(`✅ تم تغيير الحالة إلى "${statusNames[newStatus]}"`);
+      }
+
+      // ---------- التراجع عن الحالة ----------
+      function undoStatus(id) {
+        const order = orders.find(o => o.id === id);
+        if (!order) return;
+        if (order.status === 'active') {
+          showNotification('الطلبية بحالة نشطة بالفعل', 'error');
+          return;
+        }
+        order.status = 'active';
+        localStorage.setItem('orders_app', JSON.stringify(orders));
+        renderOrders();
+        showNotification('↩️ تم التراجع إلى الحالة النشطة');
+      }
+
+      // ---------- حذف طلبية ----------
+      function deleteOrder(id) {
+        if (!confirm('هل أنت متأكد من حذف هذه الطلبية؟')) return;
+        orders = orders.filter(o => o.id !== id);
+        localStorage.setItem('orders_app', JSON.stringify(orders));
+        renderOrders();
+        showNotification('🗑️ تم حذف الطلبية');
+      }
+
+      // ---------- تعديل طلبية ----------
+      function editOrder(id) {
+        const order = orders.find(o => o.id === id);
+        if (!order) return;
+        
+        // إنشاء نافذة تعديل
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal-box">
+            <h3><i class="fas fa-edit" style="color: #3b82f6;"></i> تعديل الطلبية</h3>
+            <textarea id="editTextarea">${escapeHtml(order.details)}</textarea>
+            <div class="modal-actions">
+              <button class="btn btn-primary" onclick="saveEdit('${id}')">
+                <i class="fas fa-save"></i> حفظ
+              </button>
+              <button class="btn btn-secondary" onclick="closeModal()">
+                <i class="fas fa-times"></i> إلغاء
+              </button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        // التركيز على النص
+        setTimeout(() => {
+          const ta = document.getElementById('editTextarea');
+          if (ta) ta.focus();
+        }, 100);
+      }
+
+      window.saveEdit = function(id) {
+        const ta = document.getElementById('editTextarea');
+        if (!ta) return;
+        const newDetails = ta.value.trim();
+        if (!newDetails) {
+          showNotification('لا يمكن أن تكون التفاصيل فارغة', 'error');
+          return;
+        }
+        const order = orders.find(o => o.id === id);
+        if (order) {
+          order.details = newDetails;
+          localStorage.setItem('orders_app', JSON.stringify(orders));
+          renderOrders();
+          showNotification('✅ تم تعديل الطلبية بنجاح');
+        }
+        closeModal();
+      }
+
+      window.closeModal = function() {
+        const overlay = document.querySelector('.modal-overlay');
+        if (overlay) overlay.remove();
+      }
+
+      // إغلاق المودال عند الضغط على الخلفية
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal-overlay')) {
+          closeModal();
+        }
+      });
+
+      // ---------- عرض الطلبيات ----------
+      function renderOrders() {
+        if (!ordersContainer) return;
+        if (orders.length === 0) {
+          ordersContainer.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>لا توجد طلبيات حتى الآن</p>
+              <p class="text-sm opacity-60">أضف طلبية جديدة من صفحة الإضافة</p>
+            </div>
+          `;
+          return;
+        }
+
+        const sorted = [...orders].reverse();
+        let html = '';
+        sorted.forEach(order => {
+          const statusClass = {
+            'active': 'status-active',
+            'completed': 'status-completed',
+            'cancelled': 'status-cancelled',
+            'postponed': 'status-postponed'
+          }[order.status] || 'status-active';
           
+          const statusText = {
+            'active': 'نشط',
+            'completed': 'مكتمل',
+            'cancelled': 'ملغى',
+            'postponed': 'مؤجل'
+          }[order.status] || 'نشط';
+
+          html += `
+            <div class="order-item">
+              <div class="order-header">
+                <div class="order-details">${escapeHtml(order.details)}</div>
+                <span class="order-status ${statusClass}">${statusText}</span>
+              </div>
+              <div class="order-meta">
+                <span><i class="far fa-calendar-alt"></i> ${order.day}، ${order.date}</span>
+                <span><i class="far fa-clock"></i> ${order.time || '--:--'}</span>
+                <span><i class="far fa-calendar-check"></i> ${order.month || ''}</span>
+              </div>
+              <div class="order-actions">
+                <button class="btn-action btn-complete" onclick="changeStatus('${order.id}','completed')">
+                  <i class="fas fa-check"></i> تمت
+                </button>
+                <button class="btn-action btn-cancel" onclick="changeStatus('${order.id}','cancelled')">
+                  <i class="fas fa-times"></i> ملغاة
+                </button>
+                <button class="btn-action btn-postpone" onclick="changeStatus('${order.id}','postponed')">
+                  <i class="fas fa-clock"></i> مؤجلة
+                </button>
+                <button class="btn-action btn-undo" onclick="undoStatus('${order.id}')">
+                  <i class="fas fa-undo-alt"></i> تراجع
+                </button>
+                <button class="btn-action btn-edit" onclick="editOrder('${order.id}')">
+                  <i class="fas fa-pen"></i> تعديل
+                </button>
+                <button class="btn-action btn-delete" onclick="deleteOrder('${order.id}')">
+                  <i class="fas fa-trash"></i> حذف
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        ordersContainer.innerHTML = html;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // ---------- الإشعارات ----------
+      function showNotification(message, type = 'success') {
+        const existing = document.querySelector('.notification');
+        if (existing) existing.remove();
+        
+        const notification = document.createElement('div');
+        notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+        notification.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.style.animation = 'slideDown 0.3s ease reverse';
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+
+      // جعل الدوال عامة للاستخدام في HTML
+      window.changeStatus = changeStatus;
+      window.undoStatus = undoStatus;
+      window.deleteOrder = deleteOrder;
+      window.editOrder = editOrder;
+
+      // ---------- الوضع الليلي / النهاري ----------
+      function initTheme() {
+        const stored = localStorage.getItem('theme_mode') || 'light';
+        const body = document.body;
+        const icon = document.querySelector('#themeToggle i');
+        if (stored === 'dark') {
+          body.classList.add('dark-mode');
+          icon.className = 'fas fa-sun';
+        } else {
+          body.classList.remove('dark-mode');
+          icon.className = 'fas fa-moon';
+        }
+      }
+
+      document.getElementById('themeToggle').addEventListener('click', function() {
+        const body = document.body;
+        const icon = this.querySelector('i');
+        if (body.classList.contains('dark-mode')) {
+          body.classList.remove('dark-mode');
+          icon.className = 'fas fa-moon';
+          localStorage.setItem('theme_mode', 'light');
+        } else {
+          body.classList.add('dark-mode');
+          icon.className = 'fas fa-sun';
+          localStorage.setItem('theme_mode', 'dark');
+        }
+      });
+
+      // ---------- تهيئة الصفحة ----------
+      function init() {
+        initTheme();
+        const now = getCurrentDateTime();
+        orderDate.value = now.date;
+        updateDayMonth();
+        orderDate.addEventListener('change', updateDayMonth);
+        switchPage('add');
+        renderOrders();
+      }
+
+      document.addEventListener('DOMContentLoaded', init);
+    })();
+  </script>
+</body>
+</html>
