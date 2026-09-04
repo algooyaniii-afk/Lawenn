@@ -421,6 +421,7 @@
                 const isCompleted = order.status === 'completed';
                 const isCancelled = order.status === 'cancelled';
                 const isDeferred = order.status === 'deferred';
+                const isActive = order.status === 'active';
                 let statusColor = '#3b82f6';
                 if (isCompleted) statusColor = '#22c55e';
                 else if (isCancelled) statusColor = '#ef4444';
@@ -435,7 +436,7 @@
                         <span class="text-xs text-gray-400 ml-2">${order.time}</span>
                     </div>
                     <div class="flex items-center justify-between mt-2">
-                        <div class="flex gap-2 action-buttons">
+                        <div class="flex gap-2 action-buttons flex-wrap">
                             <button onclick="markOrder('${order.id}', 'completed')" class="bg-green-100 text-green-700 hover:bg-green-200 ${isCompleted ? 'opacity-50 cursor-not-allowed' : ''}" ${isCompleted ? 'disabled' : ''}>
                                 <i class="fas fa-check"></i> تمت
                             </button>
@@ -445,6 +446,9 @@
                             <button onclick="deferOrder('${order.id}')" class="bg-gray-100 text-gray-700 hover:bg-gray-200 ${isDeferred ? 'opacity-50 cursor-not-allowed' : ''}" ${isDeferred ? 'disabled' : ''}>
                                 <i class="fas fa-clock"></i> مؤجلة
                             </button>
+                            ${!isActive ? `<button onclick="resetOrderStatus('${order.id}')" class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200" title="استرجاع الطلبية">
+                                <i class="fas fa-undo"></i> تراجع
+                            </button>` : ''}
                         </div>
                         <div class="flex gap-2">
                             <button onclick="openEditModal('${order.id}')" class="text-blue-400 hover:text-blue-600 text-sm">
@@ -566,6 +570,20 @@
             }
         }
 
+        function resetOrderStatus(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+            
+            // إعادة الحالة إلى نشطة
+            order.status = 'active';
+            
+            // إزالة من المؤجلات إن وجدت
+            deferredOrders = deferredOrders.filter(d => d.id !== id);
+            
+            saveData();
+            showNotification('✅ تم استرجاع الطلبية بنجاح');
+        }
+
         function deleteOrder(id) {
             if (confirm('هل أنت متأكد من حذف هذه الطلبية؟')) {
                 orders = orders.filter(o => o.id !== id);
@@ -630,7 +648,7 @@
         function addDeferredOrder() {
             const details = document.getElementById('deferredDetails').value.trim();
             const datetime = document.getElementById('deferredDateTime').value;
-            if (!details) { showNotification('يرجى إدخال تفاصيل الطلبية المؤجل��', 'error'); return; }
+            if (!details) { showNotification('يرجى إدخال تفاصيل الطلبية المؤجلة', 'error'); return; }
             if (!datetime) { showNotification('يرجى اختيار التاريخ والوقت', 'error'); return; }
             const newDeferred = {
                 id: generateId(),
@@ -750,7 +768,7 @@
         }
 
         // ============================================================
-        // 7. الإشعارات
+        // 8. الإشعارات
         // ============================================================
         function showNotification(message, type = 'success') {
             const existing = document.querySelector('.notification');
@@ -774,7 +792,7 @@
         }
 
         // ============================================================
-        // 8. تثبيت PWA
+        // 9. تثبيت PWA
         // ============================================================
         let deferredPrompt;
 
@@ -790,7 +808,7 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((result) => {
                     if (result.outcome === 'accepted') {
-                        showNotification('✅ تم تثب��ت التطبيق بنجاح');
+                        showNotification('✅ تم تثبيت التطبيق بنجاح');
                         document.getElementById('installBtn').classList.remove('show');
                         document.getElementById('installBanner').classList.remove('show');
                     }
@@ -804,7 +822,7 @@
         document.getElementById('installBtn').addEventListener('click', installApp);
 
         // ============================================================
-        // 9. تفعيل الإشعارات
+        // 10. تفعيل الإشعارات
         // ============================================================
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission();
